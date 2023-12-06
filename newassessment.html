@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            background-color: darkgray;
+        }
+
+        form {
+            display: inline-block;
+            text-align: left;
+            width: 400px;
+            height: 300px;
+            background-color: whitesmoke;
+            border-radius: 30px;
+            padding: 20px;
+            border-style: ridge;
+            border-color: black;
+        }
+
+        input {
+            width: 225px;
+            height: 30px;
+            text-align: left;
+        }
+
+        button {
+            width: 150px;
+            height: 35px;
+            border-radius: 30px;
+            text-align: center;
+            align-items: center;
+            border-color: black;
+            border-width: 2px;
+            font-size: 15;
+        }
+
+        label {
+            display: inline-block;
+            text-align: left;
+            width: 150px;
+            font-size: 20;
+        }
+
+        #btn {
+            text-align: center;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <form id="form">
+        <div>
+            <label for="uid" minlength="8" maxlength="12"><b>User Id:</b></label>
+            <input type="text" id="uid" placeholder="Enter User Id" minlength="8" maxlength="12"><br><br>
+            <span id="uidError" style="color: red;"></span><br>
+        </div>
+        <div>
+            <label for="fname"><b>First Name:</b></label>
+            <input type="text" id="fname" placeholder="John"><br><br>
+            <span id="fnameError" style="color: red;"></span><br>
+        </div>
+        <div>
+            <label for="lname"><b>Last Name:</b></label>
+            <input type="text" id="lname" placeholder="Doe"><br><br>
+            <span id="lnameError" style="color: red;"></span><br>
+        </div>
+        <div>
+            <label for="DOB"><b>Birthday:</b></label>
+            <input type="date" id="Birthday"><br>
+            <span id="birthdayError" style="color: red;"></span><br>
+        </div>
+        
+        <div id="btn">
+            <button type="submit">Accept</button>
+        </div>
+    </form>
+    <div id="results"></div>
+    <div id="pattern"></div>
+
+    <script>
+        // Get the form and input elements
+        const form = document.getElementById('form');
+        const fname = document.getElementById('fname');
+        const lname = document.getElementById('lname');
+        const uid = document.getElementById('uid');
+        const birthday = document.getElementById('Birthday');
+
+        // Get the error message elements
+        const fnameError = document.getElementById('fnameError');
+        const lnameError = document.getElementById('lnameError');
+        const uidError = document.getElementById('uidError');
+        const birthdayError = document.getElementById('birthdayError');
+
+        // Add event listener to the form submit button
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            if (validateInput()) {
+                const daysAlive = dateDiff();
+                displayResults(daysAlive);
+                printXs();
+            }
+        });
+
+        // Validate the input fields
+        function validateInput() {
+            let isValid = true;
+
+            if (fname.value === "") {
+                fnameError.innerHTML = "Invalid first name";
+                isValid = false;
+            } else {
+                fnameError.innerHTML = "";
+            }
+
+            if (lname.value === "") {
+                lnameError.innerHTML = "Invalid last name";
+                isValid = false;
+            } else {
+                lnameError.innerHTML = "";
+            }
+
+            if (uid.value === "") {
+                uidError.innerHTML = "Invalid user ID";
+                isValid = false;
+            } else if (uid.value.length < 8 || uid.value.length > 12) {
+                uidError.innerHTML = "User ID must be between 8 and 12 characters";
+                isValid = false;
+            } else {
+                uidError.innerHTML = "";
+                isValid = uidIsValid();
+            }
+
+            if (birthday.value === "") {
+                birthdayError.innerHTML = "Invalid birthday";
+                isValid = false;
+            } else {
+                birthdayError.innerHTML = "";
+            }
+
+            return isValid;
+        }
+
+        // Validate the user ID
+        function uidIsValid() {
+            let hasLowerCase = false;
+            let hasUpperCase = false;
+            let hasNumber = false;
+
+            for (let i = 0; i < uid.value.length; i++) {
+                if (uid.value[i] >= 'a' && uid.value[i] <= 'z') {
+                    hasLowerCase = true;
+                }
+
+                if (uid.value[i] >= 'A' && uid.value[i] <= 'Z') {
+                    hasUpperCase = true;
+                }
+
+                if (uid.value[i] >= '0' && uid.value[i] <= '9') {
+                    hasNumber = true;
+                }
+            }
+
+            if (hasLowerCase && hasUpperCase && hasNumber) {
+                uidError.innerHTML = "";
+                return true;
+            } else {
+                if (!hasLowerCase) {
+                    uidError.innerHTML = "Invalid User ID, Must contain at least one lowercase letter";
+                } else if (!hasUpperCase) {
+                    uidError.innerHTML = "Invalid User ID, Must contain at least one uppercase letter";
+                } else if (!hasNumber) {
+                    uidError.innerHTML = "Invalid User ID, Must contain at least one number";
+                }
+
+                return false;
+            }
+        }
+
+        // Calculate the number of days alive
+        function dateDiff(date) {
+            const today = new Date();
+            const userBirthday = new Date(birthday.value);
+            const days = Math.floor((today - userBirthday) / (1000 * 60 * 60 * 24));
+
+            if (days < 365 * 18) {
+                return "you are probably not old enough to take this class!";
+            } else {
+                return "you have been alive for " + days + " days!";
+            }
+        }
+
+        // Display the results on the page
+        function displayResults(daysAlive) {
+            const resultsElement = document.getElementById("results");
+            resultsElement.innerHTML = `
+                <p>${fname.value} ${lname.value} ${daysAlive}</p>
+                
+                
+            `;
+        }
+
+        // Print the pattern of "x" characters
+        function printXs() {
+            const patternElement = document.getElementById("pattern");
+            let str = "x";
+            let pattern = "";
+
+            for (let i = 1; i <= 20; i++) {
+                pattern += str.padStart(i, 'x') + "<br>";
+            }
+
+            patternElement.innerHTML = pattern;
+        }
+    </script>
+</body>
+</html>
